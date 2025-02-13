@@ -106,7 +106,9 @@
         function startDrag(e) {
             isDragging = true;
             nugget.src = "nugget.png"; // Change to grabbed image
-            header.textContent = "CONGRATS!" <br> "U CAUGHT HIM!"; // Change header text immediately
+            header.textContent = "CONGRATS!"; // Change header text immediately
+            <br>
+            header.textContent = "U CAUGHT HIM!";
             header.classList.add("congrats"); // Apply bold and large style to header
 
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
