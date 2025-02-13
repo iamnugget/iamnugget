@@ -15,12 +15,12 @@
         /* Header styling */
         h1 {
             text-align: center;
-            font-size: 36px;
+            font-size: 50px;
             margin-top: 20px;
         }
 
         .nugget {
-            width: 150px;
+            width: 250px;
             position: absolute;
             top: 50%;
             left: 50%;
@@ -32,14 +32,17 @@
             cursor: grabbing;
         }
 
-        .congrats {
-    font-weight: bold;
-    font-size: 48px;
-    text-align: center;
-    display: flex;
-    flex-direction: column; /* Forces text into separate lines */
-    align-items: center;
-}
+        .congrats-text {
+            display: flex;
+            flex-direction: column; /* Forces "U CAUGHT HIM!" to go below "CONGRATS!" */
+            align-items: center;
+            text-align: center;
+        }
+
+        .congrats-text span {
+            font-size: inherit;
+            font-weight: bold;
+        }
 
 .break-line {
     display: block; /* Forces a line break */
@@ -115,7 +118,7 @@
         function startDrag(e) {
             isDragging = true;
             nugget.src = "nugget.png"; // Change to grabbed image
-            header.textContent = "CONGRATS! U CAUGHT HIM!"; // Change header text immediately
+                header.innerHTML = "<div class='congrats-text'>CONGRATS!<span>U CAUGHT HIM!</span></div>"; // Change header text immediately
             header.classList.add("congrats"); // Apply bold and large style to header
 
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
