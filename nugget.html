@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catch Nugget!</title>
+    <style>
+        body {
+            background-color: #f8e71c;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Header styling */
+        h1 {
+            text-align: center;
+            font-size: 36px;
+            margin-top: 20px;
+        }
+
+        .nugget {
+            width: 150px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            cursor: grab;
+        }
+
+        .nugget:active {
+            cursor: grabbing;
+        }
+
+        .congrats {
+            font-weight: bold;
+            font-size: 48px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header initially saying "Catch Nugget!" -->
+    <h1 id="header">Catch Nugget!</h1>
+
+    <img src="nugget2.png" alt="Nugget the Cat" class="nugget" id="nugget">
+
+    <script>
+        const nugget = document.getElementById("nugget");
+        const header = document.getElementById("header");
+
+        let x = Math.random() * window.innerWidth;
+        let y = Math.random() * window.innerHeight;
+        let dx = (Math.random() - 1.5) * 5; // Speed in X direction
+        let dy = (Math.random() - 1.5) * 5; // Speed in Y direction
+        let isDragging = false;
+
+        function moveNugget() {
+            if (!isDragging) {
+                // Update position based on speed and direction
+                x += dx;
+                y += dy;
+
+                // Boundary collision logic (bounce off walls)
+                if (x <= 0 || x >= window.innerWidth - nugget.width) {
+                    dx = -dx; // Reverse direction in X
+                }
+
+                if (y <= 0 || y >= window.innerHeight - nugget.height) {
+                    dy = -dy; // Reverse direction in Y
+                }
+
+                nugget.style.left = `${x}px`;
+                nugget.style.top = `${y}px`;
+            }
+
+            // Continue the movement
+            requestAnimationFrame(moveNugget);
+        }
+
+        function runAwayFromCursor(e) {
+            if (isDragging) return;
+
+            const nuggetRect = nugget.getBoundingClientRect();
+            const nuggetX = nuggetRect.left + nuggetRect.width / 2;
+            const nuggetY = nuggetRect.top + nuggetRect.height / 2;
+            const distance = Math.hypot(e.clientX - nuggetX, e.clientY - nuggetY);
+
+            if (distance < 150) { // Cursor is too close—Nugget panics!
+                let dx = (nuggetX - e.clientX) * 1.5; // Move away from cursor
+                let dy = (nuggetY - e.clientY) * 1.5;
+
+                let newX = nugget.offsetLeft + dx;
+                let newY = nugget.offsetTop + dy;
+
+                // Keep Nugget inside screen bounds
+                newX = Math.max(0, Math.min(window.innerWidth - nugget.width, newX));
+                newY = Math.max(0, Math.min(window.innerHeight - nugget.height, newY));
+
+                nugget.style.left = `${newX}px`;
+                nugget.style.top = `${newY}px`;
+            }
+        }
+
+        // Handle touch and mouse events
+        function startDrag(e) {
+            isDragging = true;
+            nugget.src = "nugget.png"; // Change to grabbed image
+            header.textContent = "CONGRATS! U CAUGHT HIM!"; // Change header text immediately
+            header.classList.add("congrats"); // Apply bold and large style to header
+
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            let shiftX = clientX - nugget.getBoundingClientRect().left - nugget.width / 2;
+            let shiftY = clientY - nugget.getBoundingClientRect().top - nugget.height / 2;
+
+            function moveAt(pageX, pageY) {
+                nugget.style.left = pageX - nugget.width / 2 + "px";
+                nugget.style.top = pageY - nugget.height / 2 + "px";
+            }
+
+            function onMove(event) {
+                const pageX = event.touches ? event.touches[0].pageX : event.pageX;
+                const pageY = event.touches ? event.touches[0].pageY : event.pageY;
+                moveAt(pageX, pageY);
+            }
+
+            document.addEventListener("mousemove", onMove);
+            document.addEventListener("touchmove", onMove);
+
+            // When mouse or touch is released, Nugget should be "dropped" and return to running state
+            function endDrag() {
+                document.removeEventListener("mousemove", onMove);
+                document.removeEventListener("touchmove", onMove);
+                isDragging = false;
+                nugget.src = "nugget2.png"; // Change back to running image
+                header.textContent = "Catch Nugget!"; // Reset header text to original
+                header.classList.remove("congrats"); // Remove bold and large style
+            }
+
+            document.addEventListener("mouseup", endDrag, { once: true });
+            document.addEventListener("touchend", endDrag, { once: true });
+        }
+
+        nugget.addEventListener("mousedown", startDrag);
+        nugget.addEventListener("touchstart", startDrag);
+
+        // Prevent default drag behavior
+        nugget.ondragstart = () => false;
+
+        // Start moving Nugget immediately
+        moveNugget();
+
+        // Make Nugget run away from the cursor
+        document.addEventListener("mousemove", runAwayFromCursor);
+        document.addEventListener("touchmove", runAwayFromCursor);
+    </script>
+
+</body>
+</html>
